@@ -36,29 +36,44 @@ function kartbot(opts) {
 
     // sometimes the message is an image, so check that there's actual text first
     if (message.text) {
-      switch (message.text.toLowerCase()) {
+      var msg = message.text.toLowerCase();
+      switch (true) {
         // challenge other members to a game of kart
-        case '!kart':
+        case (msg.indexOf('!kart') > -1):
           pool = challenge(channel, members, user, 'Kart');
           break;
 
         // challenge other members to game of smash
-        case '!smash':
+        case (msg.indexOf('!smash') > -1):
           pool = challenge(channel, members, user, 'Smash');
           break;
 
         // opt out of playing
-        case '!nokart':
+        case (msg.indexOf('!nokart') > -1):
           pool = reject(channel, members, user, pool);
           break;
 
         // show amount of times members have challenged and have been challenged
-        case '!score':
+        case (msg.indexOf('!score') > -1):
 
           break;
 
+        case (msg.indexOf('!roll') > -1):
+          var args = msg.split(' ');
+          if (members.indexOf(args[1]) > -1) {
+            var firstRoll = Math.round(Math.random() * 100),
+                secondRoll = Math.round(Math.random() * 100),
+                c = upper(user.name),
+                o = upper(args[1]);
+
+            var winner = firstRoll > secondRoll ? c : o;
+
+            channel.send(c + ' fancies their chances against ' + o + '!\n' + c + ' rolls: ' + firstRoll + '\n' + o + ' rolls: ' + secondRoll + '\n\n' + winner + ' is the winner!');
+          }
+          break;
+
         // send list of commands
-        case '!help':
+        case (msg.indexOf('!help') > -1):
           channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros');
           break;
       }
