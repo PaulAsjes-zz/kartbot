@@ -1,13 +1,13 @@
 {
   "name": "kartbot",
-  "version": "0.0.0",
-  "description": "My mind-blowing module",
+  "version": "0.0.1",
+  "description": "Slack bot for Mario Kart tournaments",
   "license": "MIT",
   "repository": "PaulAsjes/kartbot",
   "author": {
     "name": "Paul Asjes",
     "email": "p.asjes@gmail.com",
-    "url": "sols.co"
+    "url": "internetjones.net"
   },
   "engines": {
     "node": ">=0.10.0"

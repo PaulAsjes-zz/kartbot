@@ -2,13 +2,13 @@
 
 > Slack bot for Mario Kart tournaments
 
+Got a Wii at work? Use Slack? Use this bot to challenge random colleagues to a game of Mario Kart!
 
 ## Install
 
 ```
 $ npm install --save kartbot
 ```
-
 
 ## Usage
 
@@ -22,6 +22,12 @@ kartbot({
 });
 ```
 
+## Commands
+`!kart` - Challenge random channel members to Mario Kart
+`!smash` - Challenge random channel members to Smash Bros
+`!nokart` - Reject a challenge
+`!roll USER` - Challenge someone in the channel to a game of chance
+
 ## License
 
-MIT © [Paul Asjes](http://sols.co)
+MIT © [Paul Asjes](http://internetjones.net)

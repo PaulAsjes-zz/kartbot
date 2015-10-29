@@ -27,10 +27,6 @@ function kartbot(opts) {
       return;
     }
 
-    if (message.text && message.text.toLowerCase().indexOf('hi kartbot') > -1 && user) {
-      channel.send('Hi ' + upper(user.name) + '!');
-    }
-
     var members;
     if (channel.members) {
       members = channel.members.map(function(member) {
@@ -43,6 +39,22 @@ function kartbot(opts) {
       var msg = message.text.toLowerCase();
       var args = msg.split(' ');
       switch (true) {
+        // say hi!
+        case (msg.indexOf('hi kartbot') > -1):
+          var responses = [
+            ', why aren\'t you karting right now?',
+            ', good time to kart!',
+            ', you look nice today!',
+            ', there appears to be a severe lack of kart in this channel.',
+            ', what\'s your favourite game on the Wii and why is it Mario Kart?'
+          ];
+
+          var res = responses[Math.floor(Math.random() * responses.length)];
+
+          channel.send('Hi ' + upper(user.name) + res);
+
+          break;
+
         // challenge other members to a game of kart
         case (msg.indexOf('!kart') > -1):
           pool = challenge(channel, members, user, args, 'Kart');
@@ -70,7 +82,11 @@ function kartbot(opts) {
 
         // send list of commands
         case (msg.indexOf('!help') > -1):
-          channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros \n \`!nokart\` - Reject the challenge :( \n \`!roll USER\` - Challenge someone in the channel to a game of chance');
+          channel.send('Possible commands are: \n ' +
+                       '\`!kart\` - Challenge random channel members to Mario Kart \n ' +
+                       '\`!smash\` - Challenge random channel members to Smash Bros \n ' +
+                       '\`!nokart\` - Reject the challenge :( \n ' +
+                       '\`!roll USER\` - Challenge someone in the channel to a game of chance');
           break;
       }
     }
@@ -108,6 +124,10 @@ function roll(args, user, channel, members) {
 
 function reject(channel, members, user, pool) {
   if (pool.indexOf(user.name) > 0) {
+    // remove original rejecter and kartbot
+    members.splice(pool.indexOf(user.name), 1);
+    members.splice(pool.indexOf('kartbot'), 1);
+
     var newPlayer;
     do {
       newPlayer = members[Math.floor(Math.random() * members.length)];
@@ -115,11 +135,12 @@ function reject(channel, members, user, pool) {
 
     channel.send(upper(user.name) + ' has dropped out! ' + upper(newPlayer) + ' has been challenged in their place!');
 
-    pool.slice(pool.indexOf(user.name), newPlayer);
+    pool.splice(pool.indexOf(user.name), 1, newPlayer);
+    var karters = pool.map(upper);
+    channel.send('Current karters: ' + karters.join(', '));
   } else {
     channel.send(upper(user.name) + ' has tried to drop out, but they weren\'t invited to play! Jerk!');
   }
-
   return pool;
 }
 
@@ -136,6 +157,7 @@ function challenge(channel, members, user, args, game) {
   var ret = '',
       hasChallenged = false;
 
+  // use names given
   if (args.slice(1).length > 0) {
     pool = args.slice(1);
     hasChallenged = true;
