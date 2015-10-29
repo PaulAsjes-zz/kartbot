@@ -1,6 +1,6 @@
-# kartbot [![Build Status](https://travis-ci.org/PaulAsjes/kartbot.svg?branch=master)](https://travis-ci.org/PaulAsjes/kartbot)
+# kartbot
 
-> My mind-blowing module
+> Slack bot for Mario Kart tournaments
 
 
 ## Install
@@ -15,30 +15,12 @@ $ npm install --save kartbot
 ```js
 const kartbot = require('kartbot');
 
-kartbot('unicorns');
-//=> 'unicorns & rainbows'
+kartbot({
+  token: YOUR_TOKEN_HERE, // Add a bot at https://my.slack.com/services/new/bot and copy the token here.
+  autoReconnect: true, // Automatically reconnect after an error response from Slack.
+  autoMark: true // Automatically mark each message as read after it is processed.
+});
 ```
-
-
-## API
-
-### kartbot(input, [options])
-
-#### input
-
-Type: `string`
-
-Lorem ipsum.
-
-#### options
-
-##### foo
-
-Type: `boolean`  
-Default: `false`
-
-Lorem ipsum.
-
 
 ## License
 
