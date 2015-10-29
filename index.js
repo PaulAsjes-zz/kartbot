@@ -59,22 +59,12 @@ function kartbot(opts) {
           break;
 
         case (msg.indexOf('!roll') > -1):
-          var args = msg.split(' ');
-          if (members.indexOf(args[1]) > -1) {
-            var firstRoll = Math.round(Math.random() * 100),
-                secondRoll = Math.round(Math.random() * 100),
-                c = upper(user.name),
-                o = upper(args[1]);
-
-            var winner = firstRoll > secondRoll ? c : o;
-
-            channel.send(c + ' fancies their chances against ' + o + '!\n' + c + ' rolls: ' + firstRoll + '\n' + o + ' rolls: ' + secondRoll + '\n\n' + winner + ' is the winner!');
-          }
+          roll(msg, user, channel, members);
           break;
 
         // send list of commands
         case (msg.indexOf('!help') > -1):
-          channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros');
+          channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros \n \`!roll USER\` - Challenge someone in the channel to a game of chance');
           break;
       }
     }
@@ -86,6 +76,27 @@ function kartbot(opts) {
 
   slack.login();
 };
+
+function roll(msg, user, channel, members) {
+  var args = msg.split(' ');
+  if (members.indexOf(args[1]) > -1) {
+    if (args[1] === user.name) {
+      channel.send(upper(user.name) + ' tried to roll against themselves. _They lost._');
+      return;
+    }
+
+    var firstRoll = Math.round(Math.random() * 100),
+        secondRoll = Math.round(Math.random() * 100),
+        c = upper(user.name),
+        o = upper(args[1]);
+
+    var winner = firstRoll > secondRoll ? c : o;
+
+    channel.send(c + ' fancies their chances against ' + o + '!\n' + c + ' rolls: ' + firstRoll + '\n' + o + ' rolls: ' + secondRoll + '\n\n*' + winner + ' is the winner!*');
+  } else {
+    channel.send('Sorry ' + upper(user.name) + ', but ' + args.slice(1).join(' ') + ' is in another castle.');
+  }
+}
 
 function reject(channel, members, user, pool) {
   if (pool.indexOf(user.name) > 0) {
