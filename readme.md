@@ -24,8 +24,11 @@ kartbot({
 
 ## Commands
 `!kart` - Challenge random channel members to Mario Kart
+
 `!smash` - Challenge random channel members to Smash Bros
+
 `!nokart` - Reject a challenge
+
 `!roll USER` - Challenge someone in the channel to a game of chance
 
 ## License
