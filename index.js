@@ -23,8 +23,12 @@ function kartbot(opts) {
     var user = slack.getUserByID(message.user),
         channel = slack.getChannelGroupOrDMByID(message.channel);
 
+    if (user.name === 'slackbot') {
+      return;
+    }
+
     if (message.text && message.text.toLowerCase().indexOf('hi kartbot') > -1 && user) {
-      channel.send('Hi ' + user.name + '!');
+      channel.send('Hi ' + upper(user.name) + '!');
     }
 
     var members;
@@ -37,15 +41,16 @@ function kartbot(opts) {
     // sometimes the message is an image, so check that there's actual text first
     if (message.text) {
       var msg = message.text.toLowerCase();
+      var args = msg.split(' ');
       switch (true) {
         // challenge other members to a game of kart
         case (msg.indexOf('!kart') > -1):
-          pool = challenge(channel, members, user, 'Kart');
+          pool = challenge(channel, members, user, args, 'Kart');
           break;
 
         // challenge other members to game of smash
         case (msg.indexOf('!smash') > -1):
-          pool = challenge(channel, members, user, 'Smash');
+          pool = challenge(channel, members, user, args, 'Smash');
           break;
 
         // opt out of playing
@@ -54,17 +59,18 @@ function kartbot(opts) {
           break;
 
         // show amount of times members have challenged and have been challenged
-        case (msg.indexOf('!score') > -1):
+        case (msg.indexOf('!stats') > -1):
 
           break;
 
+        // roll the dice against someone else
         case (msg.indexOf('!roll') > -1):
-          roll(msg, user, channel, members);
+          roll(args, user, channel, members);
           break;
 
         // send list of commands
         case (msg.indexOf('!help') > -1):
-          channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros \n \`!roll USER\` - Challenge someone in the channel to a game of chance');
+          channel.send('Possible commands are: \n \`!kart\` - Challenge random channel members to Mario Kart \n \`!smash\` - Challenge random channel members to Smash Bros \n \`!nokart\` - Reject the challenge :( \n \`!roll USER\` - Challenge someone in the channel to a game of chance');
           break;
       }
     }
@@ -77,8 +83,7 @@ function kartbot(opts) {
   slack.login();
 };
 
-function roll(msg, user, channel, members) {
-  var args = msg.split(' ');
+function roll(args, user, channel, members) {
   if (members.indexOf(args[1]) > -1) {
     if (args[1] === user.name) {
       channel.send(upper(user.name) + ' tried to roll against themselves. _They lost._');
@@ -94,7 +99,10 @@ function roll(msg, user, channel, members) {
 
     channel.send(c + ' fancies their chances against ' + o + '!\n' + c + ' rolls: ' + firstRoll + '\n' + o + ' rolls: ' + secondRoll + '\n\n*' + winner + ' is the winner!*');
   } else {
-    channel.send('Sorry ' + upper(user.name) + ', but ' + args.slice(1).join(' ') + ' is in another castle.');
+    // stop people from trying !roll without a command
+    var joined = args.slice(1).join(' ');
+    var res = args.slice(1).length > 1 || joined === '' ? 'that dumb thing you just tried' : joined;
+    channel.send('Sorry ' + upper(user.name) + ', but ' + res + ' is in another castle.');
   }
 }
 
@@ -115,24 +123,51 @@ function reject(channel, members, user, pool) {
   return pool;
 }
 
-function challenge(channel, members, user, game) {
+function challenge(channel, members, user, args, game) {
   var pool = members.concat();
+
+  for (var i = 1; i < args.length; i++) {
+    if (members.indexOf(args[i]) < 0) {
+      channel.send(upper(user.name) + ' wants a game of ' + game + ', but I can\'t find ' + args[i] + ' in this channel!');
+      return;
+    }
+  }
+
+  var ret = '',
+      hasChallenged = false;
+
+  if (args.slice(1).length > 0) {
+    pool = args.slice(1);
+    hasChallenged = true;
+  }
+
+  // filter out duplicates
+  pool = pool.filter(function(item, pos) {
+    return pool.indexOf(item) === pos;
+  });
+
   // remove kart caller from list
   pool.splice(pool.indexOf(user.name), 1);
 
   // remove kartbot from list
   pool.splice(pool.indexOf('kartbot'), 1);
 
-  // randomly pick people from pool
-  var len = pool.length < 3 ? pool.length : 3;
+  if (!hasChallenged) {
+    // randomly pick people from pool
+    var len = pool.length < 3 ? pool.length : 3;
 
-  while (pool.length > len) {
-    var seed = Math.floor(Math.random() * pool.length);
-    pool.splice(seed, 1);
+    while (pool.length > len) {
+      var seed = Math.floor(Math.random() * pool.length);
+      pool.splice(seed, 1);
+    }
+  }
+
+  if (pool.length < 3) {
+    ret = ' Room for ' + (3 - pool.length) + ' more!';
   }
 
   var names = pool.map(upper);
-  channel.send(game + ' time! ' + upper(user.name) + ' has challenged ' + names.join(', ') + ' to a game of ' + game + '!');
+  channel.send(game + ' time! ' + upper(user.name) + ' has challenged ' + names.join(', ') + ' to a game of ' + game + '!' + ret);
 
   // add the original challenger back to the list
   pool.push(user.name);
