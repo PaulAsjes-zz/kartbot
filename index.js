@@ -3,7 +3,6 @@
 var Slack = require('slack-client');
 
 function kartbot(opts) {
-  // console.log('bonjour');
   var slackToken = opts.token,
       autoReconnect = opts.autoReconnect || true,
       autoMark = opts.autoMark || true;
@@ -23,7 +22,7 @@ function kartbot(opts) {
     var user = slack.getUserByID(message.user),
         channel = slack.getChannelGroupOrDMByID(message.channel);
 
-    if (user.name === 'slackbot') {
+    if (user && user.name === 'slackbot') {
       return;
     }
 
