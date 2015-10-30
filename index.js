@@ -1,7 +1,7 @@
 'use strict';
 
 const Slack = require('slack-client');
-const maxPlayers;
+var maxPlayers;
 
 function kartbot(opts) {
   var slackToken = opts.token,
@@ -59,33 +59,33 @@ function kartbot(opts) {
           break;
 
         // challenge other members to a game of kart
-        case (msg.indexOf('!kart') > -1):
+        case (args[0] === '!kart'):
           pool = challenge(channel, members, user, args, 'Kart');
           break;
 
         // challenge other members to game of smash
-        case (msg.indexOf('!smash') > -1):
+        case (args[0] === '!smash':
           pool = challenge(channel, members, user, args, 'Smash');
           break;
 
         // opt out of playing
-        case (msg.indexOf('!nokart') > -1):
+        case (args[0] === '!nokart':
           pool = reject(channel, members, user, pool);
           break;
 
         // show amount of times members have challenged and have been challenged
-        case (msg.indexOf('!stats') > -1):
+        case (args[0] === '!stats':
 
           break;
 
         // roll the dice against someone else
-        case (msg.indexOf('!roll') > -1):
+        case (args[0] === '!roll':
           roll(args, user, channel, members);
           break;
 
         // send list of commands
         case (msg.indexOf('!help') > -1):
-          channel.send('Possible commands are: \n ' +
+          channel.send('Hi ' + upper(user.name) + '! Possible commands are: \n ' +
                        '\`!kart\` - Challenge random channel members to Mario Kart \n ' +
                        '\`!smash\` - Challenge random channel members to Smash Bros \n ' +
                        '\`!nokart\` - Reject the challenge :( \n ' +
