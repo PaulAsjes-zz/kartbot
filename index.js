@@ -1,11 +1,15 @@
 'use strict';
 
-var Slack = require('slack-client');
+const Slack = require('slack-client');
+const maxPlayers;
 
 function kartbot(opts) {
   var slackToken = opts.token,
       autoReconnect = opts.autoReconnect || true,
       autoMark = opts.autoMark || true;
+
+  // max players for mario kart is 4, but perhaps we want to use this for other games (like smash?)
+  maxPlayers = opts.maxPlayers || 4;
 
   var slack = new Slack(slackToken, autoReconnect, autoMark);
 
@@ -175,7 +179,7 @@ function challenge(channel, members, user, args, game) {
 
   if (!hasChallenged) {
     // randomly pick people from pool
-    var len = pool.length < 3 ? pool.length : 3;
+    var len = pool.length < (maxPlayers - 1) ? pool.length : maxPlayers - 1;
 
     while (pool.length > len) {
       var seed = Math.floor(Math.random() * pool.length);
@@ -183,8 +187,8 @@ function challenge(channel, members, user, args, game) {
     }
   }
 
-  if (pool.length < 3) {
-    ret = ' Room for ' + (3 - pool.length) + ' more!';
+  if (pool.length < (maxPlayers - 1)) {
+    ret = ' Room for ' + ((maxPlayers - 1) - pool.length) + ' more!';
   }
 
   var names = pool.map(upper);
