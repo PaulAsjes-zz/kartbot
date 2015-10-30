@@ -14,7 +14,7 @@ function kartbot(opts) {
   var slack = new Slack(slackToken, autoReconnect, autoMark);
 
   // pool of players currently playing
-  var pool;
+  var pool = [];
 
   slack.on('open', function() {
     console.log(`Connected to ${slack.team.name} as ${slack.self.name}`);
@@ -26,7 +26,8 @@ function kartbot(opts) {
     var user = slack.getUserByID(message.user),
         channel = slack.getChannelGroupOrDMByID(message.channel);
 
-    if (user && user.name === 'slackbot') {
+    if (user && user.is_bot) {
+      channel.send('Sorry, I don\'t play well with other bots.')
       return;
     }
 
@@ -71,14 +72,21 @@ function kartbot(opts) {
 
         // opt out of playing
         case (args[0] === '!nokart'):
-          console.log(pool);
           pool = reject(channel, members, user, pool);
-          console.log(pool);
           break;
 
         // show amount of times members have challenged and have been challenged
         case (args[0] === '!stats'):
 
+          break;
+
+        case (args[0] === '!list'):
+          if (pool && pool.length > 0) {
+            var names = pool.map(upper);
+            channel.send(`${names.join(', ')} are currently challenged!`);
+          } else {
+            channel.send('No challengers have challenged challengees! This makes kartbot sad :(');
+          }
           break;
 
         // roll the dice against someone else
@@ -88,13 +96,12 @@ function kartbot(opts) {
 
         // send list of commands
         case (msg.indexOf('!help') > -1):
-          channel.send(
-            `Hi ${upper(user.name)}! Possible commands are:
-            \`!kart\` - Challenge random channel members to Mario Kart
-            \`!smash\` - Challenge random channel members to Smash Bros
-            \`!nokart\` - Reject the challenge :(
-            \`!roll USER\` - Challenge someone in the channel to a game of chance`
-         );
+          channel.send(`Hi ${upper(user.name)}! Possible commands are:`);
+          channel.send(`> \`!kart\` - Challenge random channel members to Mario Kart`);
+          channel.send(`> \`!smash\` - Challenge random channel members to Smash Bros`);
+          channel.send(`> \`!nokart\` - Reject the challenge :(`);
+          channel.send(`> \`!list\` - See who's currently challenged`);
+          channel.send(`> \`!roll USER\` - Challenge someone in the channel to a game of chance`);
           break;
       }
     }
@@ -108,6 +115,12 @@ function kartbot(opts) {
 };
 
 function roll(args, user, channel, members) {
+  // if someone tries to PM kartbot
+  if (!members) {
+    channel.send('No thanks, that seems a bit pointless.');
+    return;
+  }
+
   if (members.indexOf(args[1]) > -1) {
     if (args[1] === user.name) {
       channel.send(`${upper(user.name)} tried to roll against themselves. _They lost._`);
@@ -160,6 +173,11 @@ function reject(channel, members, user, pool) {
 }
 
 function challenge(channel, members, user, args, game) {
+  // if no members, that means you're trying to DM kartbot
+  if (!members || args.indexOf('kartbot') > -1) {
+    channel.send('Thanks, but I don\'t want to play right now.');
+    return [];
+  }
   var pool = members.concat();
 
   for (var i = 1; i < args.length; i++) {
@@ -184,10 +202,14 @@ function challenge(channel, members, user, args, game) {
   });
 
   // remove kart caller from list
-  pool.splice(pool.indexOf(user.name), 1);
+  if (pool.indexOf(user.name) > -1) {
+    pool.splice(pool.indexOf(user.name), 1);
+  }
 
   // remove kartbot from list
-  pool.splice(pool.indexOf('kartbot'), 1);
+  if (pool.indexOf('kartbot') > -1) {
+    pool.splice(pool.indexOf('kartbot'), 1);
+  }
 
   if (!hasChallenged) {
     // randomly pick people from pool
