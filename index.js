@@ -27,7 +27,6 @@ function kartbot(opts) {
         channel = slack.getChannelGroupOrDMByID(message.channel);
 
     if (user && user.is_bot) {
-      channel.send('Sorry, I don\'t play well with other bots.')
       return;
     }
 
@@ -182,7 +181,7 @@ function challenge(channel, members, user, args, game) {
 
   for (var i = 1; i < args.length; i++) {
     if (members.indexOf(args[i]) < 0) {
-      channel.send(`${upper(user.name)} wants a game of ${game}, but I can\'t find ${args[i]} in this channel!`);
+      channel.send(`${upper(user.name)} wants a game of ${game}, but I can\'t find '${args[i]}' in this channel!`);
       return;
     }
   }

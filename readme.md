@@ -29,6 +29,8 @@ kartbot({
 
 `!nokart` - Reject a challenge
 
+`!list` - See who's currently challenged
+
 `!roll USER` - Challenge someone in the channel to a game of chance
 
 ## License
