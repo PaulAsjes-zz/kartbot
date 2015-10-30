@@ -2,7 +2,7 @@
 
 > Slack bot for Mario Kart tournaments
 
-Got a Wii at work? Use Slack? Use this bot to challenge random colleagues to a game of Mario Kart!
+Play games with colleagues at work? Use Slack? Use this bot to challenge random colleagues to a bunch of games! (provide your own games)
 
 ## Install
 
