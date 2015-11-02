@@ -46,7 +46,7 @@ function kartbot(opts) {
 
       switch (true) {
         // say hi!
-        case (msg.indexOf('hi kartbot') > -1):
+        case (msg.indexOf('hi kartbot') > -1) || msg.indexOf('hi fifabot') > -1:
           var responses = [
             ', why aren\'t you playing right now?',
             ', good time to kart!',
@@ -68,7 +68,7 @@ function kartbot(opts) {
           pool = challenge(channel, members, user, args, 'Kart');
           break;
 
-          case (msg.indexOf('!fifa') > -1):
+        case (args[0] === '!fifa'):
           pool = challenge(channel, members, user, args, 'Fifa');
           break;
 
