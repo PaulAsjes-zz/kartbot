@@ -1,6 +1,6 @@
 # kartbot
 
-> Slack bot for Mario Kart tournaments
+> Slack bot for Mario Kart and Fifa tournaments
 
 Play games with colleagues at work? Use Slack? Use this bot to challenge random colleagues to a bunch of games! (provide your own games)
 
@@ -24,6 +24,8 @@ kartbot({
 
 ## Commands
 `!kart` - Challenge random channel members to Mario Kart
+
+`!fifa` - Challenge random channel members to a game of Fifa
 
 `!smash` - Challenge random channel members to Smash Bros
 

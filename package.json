@@ -1,6 +1,6 @@
 {
   "name": "kartbot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Slack bot for Mario Kart tournaments",
   "license": "MIT",
   "repository": "PaulAsjes/kartbot",

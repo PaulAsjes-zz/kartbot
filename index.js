@@ -1,6 +1,8 @@
 'use strict';
 
 const Slack = require('slack-client');
+
+const Teams = require('./teams.json');
 var maxPlayers;
 
 function kartbot(opts) {
@@ -44,12 +46,14 @@ function kartbot(opts) {
 
       switch (true) {
         // say hi!
-        case (msg.indexOf('hi kartbot') > -1):
+        case (msg.indexOf('hi kartbot') > -1) || msg.indexOf('hi fifabot') > -1:
           var responses = [
-            ', why aren\'t you karting right now?',
+            ', why aren\'t you playing right now?',
             ', good time to kart!',
             ', you look nice today!',
-            ', there appears to be a severe lack of kart in this channel.',
+            ', it\'s a good day for some trash talk!',
+            ', go play some FIFA!',
+            ', there appears to be a severe lack of gaming in this channel.',
             ', what\'s your favourite game on the Wii and why is it Mario Kart?'
           ];
 
@@ -64,13 +68,17 @@ function kartbot(opts) {
           pool = challenge(channel, members, user, args, 'Kart');
           break;
 
+        case (args[0] === '!fifa'):
+          pool = challenge(channel, members, user, args, 'Fifa');
+          break;
+
         // challenge other members to game of smash
         case (args[0] === '!smash'):
           pool = challenge(channel, members, user, args, 'Smash');
           break;
 
         // opt out of playing
-        case (args[0] === '!nokart'):
+        case (args[0] === '!nokart' || args[0] === '!nofifa'):
           pool = reject(channel, members, user, pool);
           break;
 
@@ -97,8 +105,10 @@ function kartbot(opts) {
         case (msg.indexOf('!help') > -1):
           channel.send(`Hi ${upper(user.name)}! Possible commands are:`);
           channel.send(`> \`!kart\` - Challenge random channel members to Mario Kart`);
+          channel.send(`> \`!fifa\` - Challenge random channel members to Fifa with random teams`);
           channel.send(`> \`!smash\` - Challenge random channel members to Smash Bros`);
           channel.send(`> \`!nokart\` - Reject the challenge :(`);
+          channel.send(`> \`!nofifa\` - Reject the challenge :(`);
           channel.send(`> \`!list\` - See who's currently challenged`);
           channel.send(`> \`!roll USER\` - Challenge someone in the channel to a game of chance`);
           break;
@@ -227,6 +237,13 @@ function challenge(channel, members, user, args, game) {
   var names = pool.map(upper);
   channel.send(`${game} time! ${upper(user.name)} has challenged ${names.join(', ')} to a game of ${game}! ${ret}`);
 
+  if (game.indexOf("Fifa") > -1) {
+
+    var teams = getTwoRandomTeams();
+    channel.send('The leagues are: ' + teams[0].league + ' and ' + teams[1].league);
+    channel.send('The teams are: ' + teams[0].team + ' vs. ' + teams[1].team);
+  }
+
   // add the original challenger back to the list
   pool.push(user.name);
 
@@ -235,6 +252,17 @@ function challenge(channel, members, user, args, game) {
 
 function upper(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getTwoRandomTeams() {
+  var homeLeague, awayLeague, homeTeam, awayTeam;
+
+  homeLeague = Teams.leagues[Math.floor(Math.random() * Teams.leagues.length)];
+  awayLeague = Teams.leagues[Math.floor(Math.random() * Teams.leagues.length)];
+  homeTeam = homeLeague.teams[Math.floor(Math.random() * homeLeague.teams.length)];
+  awayTeam = awayLeague.teams[Math.floor(Math.random() * awayLeague.teams.length)];
+
+  return [{"league": homeLeague.name, "team": homeTeam.name}, {"league": awayLeague.name, "team": awayTeam.name}];
 }
 
 function getChannels(allChannels) {
