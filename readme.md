@@ -2,7 +2,7 @@
 
 > Slack bot for Mario Kart and Fifa tournaments
 
-Got a Wii at work? Use Slack? Use this bot to challenge random colleagues to a game of Mario Kart! But mostly Fifa!
+Play games with colleagues at work? Use Slack? Use this bot to challenge random colleagues to a bunch of games! (provide your own games)
 
 ## Install
 
@@ -30,6 +30,8 @@ kartbot({
 `!smash` - Challenge random channel members to Smash Bros
 
 `!nokart` - Reject a challenge
+
+`!list` - See who's currently challenged
 
 `!roll USER` - Challenge someone in the channel to a game of chance
 
