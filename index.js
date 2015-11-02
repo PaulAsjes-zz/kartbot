@@ -90,7 +90,7 @@ function kartbot(opts) {
         case (args[0] === '!list'):
           if (pool && pool.length > 0) {
             var names = pool.map(upper);
-            channel.send("${names.join(', ')} are currently challenged!");
+            channel.send(`${names.join(', ')} are currently challenged!`);
           } else {
             channel.send('No challengers have challenged challengees! This makes kartbot sad :(');
           }
