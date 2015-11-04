@@ -34,10 +34,16 @@ function kartbot(opts) {
 
     var members;
     if (channel.members) {
-      members = channel.members.map(function(member) {
+      members = channel.members.filter(function(member) {
+        let m = slack.getUserByID(member);
+        return (m.presence === 'active' && !m.is_bot);
+      })
+      .map(function(member) {
         return slack.getUserByID(member).name;
       });
     }
+
+    console.log(members);
 
     // sometimes the message is an image, so check that there's actual text first
     if (message.text) {
