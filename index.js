@@ -43,8 +43,6 @@ function kartbot(opts) {
       });
     }
 
-    console.log(members);
-
     // sometimes the message is an image, so check that there's actual text first
     if (message.text) {
       var msg = message.text.toLowerCase();
@@ -146,6 +144,11 @@ function roll(args, user, channel, members) {
         secondRoll = Math.round(Math.random() * 100),
         c = upper(user.name),
         o = upper(args[1]);
+
+    // reroll in the unlikely event that it's a tie
+    while (firstRoll === secondRoll) {
+      secondRoll = Math.round(Math.random() * 100);
+    }
 
     var winner = firstRoll > secondRoll ? c : o;
 
